@@ -1,7 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
+
 const authRouter = require('./routes/auth');
 const tripRouter = require('./routes/trips');
+
 
 const apiVersion = '/api/v1/';
 
