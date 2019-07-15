@@ -1,3 +1,4 @@
+const pgPool = require('../config/pgPool');
 
 function authController() {
   function signIn(req, res) {
@@ -22,5 +23,21 @@ function authController() {
   return { signIn, signUp };
 }
 
+// let Validator = require('validatorjs');
+// let data = {
+//   name: 'John',
+//   email: 'johndoe@gmail.com',
+//   age: 28
+// };
 
+// let rules = {
+//   name: 'required',
+//   email: 'required|email',
+//   age: 'min:18'
+// };
+
+// let validation = new Validator(data, rules);
+
+// validation.passes(); // true
+// validation.fails();
 module.exports = authController;
