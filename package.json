@@ -29,8 +29,11 @@
     "sinon": "^7.3.2"
   },
   "dependencies": {
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "express-promise-router": "^3.0.3",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^7.11.0",
     "validatorjs": "^3.15.1"
   },

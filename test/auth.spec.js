@@ -31,10 +31,30 @@ suite('Authentication', () => {
     });
 
 
-    test('the response returns a status of 201 on success and 400 on error', () => {
+    test('the response returns a status of 201 on success and 400 on error', (done) => {
       authController.signUp(req, res);
+      done();
       res.status.calledWith(201).should.equal(true, 'success');
       res.status.calledWith(400).should.equal(true, `Bad status ${res.status.args[0][0]}`);
+    });
+
+    test('the response returns a status of 500 if user was not created', (done) => {
+      authController.signUp(req, res);
+      done();
+      res.status.calledWith(500).should.equal(true, 'user was not created');
+    });
+
+    test('the response body should match a particular specification', (done) => {
+      authController.signUp(req, res);
+      done();
+      res.json.calledWith({
+        status: 'success',
+        data: {
+          user_id: 1,
+          is_admin: true,
+          token: 'some_string'
+        }
+      }).should.equal(true);
     });
   });
 
