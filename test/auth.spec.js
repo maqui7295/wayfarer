@@ -68,6 +68,7 @@ suite('Authentication', () => {
       };
       res = {
         status: sinon.spy(),
+        json: sinon.spy(),
         data: {
           user_id: 1,
           is_admin: true,
@@ -76,10 +77,23 @@ suite('Authentication', () => {
       };
     });
 
-    test('the response returns a status of 200 on success and 400 on error', () => {
+    test('the response returns a status of 200 on success and 400 on error', (done) => {
       authController.signIn(req, res);
+      done();
       res.status.calledWith(200).should.equal(true, 'success');
       res.status.calledWith(400).should.equal(true, `Bad status ${res.status.args[0][0]}`);
+    });
+    test('the response body should match a particular specification', (done) => {
+      authController.signIn(req, res);
+      done();
+      res.json().should.containEql({
+        status: 'success',
+        data: {
+          user_id: 1,
+          is_admin: true,
+          token: 'some_string'
+        }
+      });
     });
   });
 });
