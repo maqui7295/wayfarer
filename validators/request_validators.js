@@ -3,9 +3,15 @@ const Validator = require('validatorjs');
 const isValid = (data, rules) => {
   const validation = new Validator(data, rules);
   if (validation.fails()) {
-    return { errors: validation.errors, is_valid: false };
+    return {
+      errors: validation.errors,
+      is_valid: false
+    };
   }
-  return { data, is_valid: true };
+  return {
+    data,
+    is_valid: true
+  };
 };
 
 // validator function
@@ -27,4 +33,17 @@ const isSignInRequestValid = (data) => {
   return isValid(data, rules);
 };
 
-module.exports = { isSignUpRequestValid, isSignInRequestValid };
+const isCreateTripRequestValid = (data) => {
+  const rules = {
+    token: 'required',
+    is_admin: 'required',
+    user_id: 'required'
+  };
+  return isValid(data, rules);
+};
+
+module.exports = {
+  isSignUpRequestValid,
+  isSignInRequestValid,
+  isCreateTripRequestValid
+};

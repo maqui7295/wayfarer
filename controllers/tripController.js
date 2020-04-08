@@ -1,4 +1,3 @@
-
 function tripController() {
   function createTrip(req, res) {
     return res.send('creating trips');
@@ -8,8 +7,10 @@ function tripController() {
     return res.send('getting all trips');
   }
 
-  return { createTrip, getTrips };
+  return {
+    createTrip,
+    getTrips
+  };
 }
-
 
 module.exports = tripController;
