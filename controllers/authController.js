@@ -1,99 +1,64 @@
 const jwt = require('jsonwebtoken');
-
 const userRepo = require('../repositories/userRepository');
 
 const {
-  isSignUpRequestValid,
-  isSignInRequestValid
-} = require('../validators/request_validators');
+  successResponse,
+  errorResponse
+} = require('../validators/responses');
+
+const {
+  SECRET_KEY
+} = require('../config/environment');
 
 function authController() {
-  const secretKey = 'some_super_secret_key';
   const loginErrorMsg = 'These credentials does not match our records, check the username and or email';
 
-  // eslint-disable-next-line consistent-return
-  const checkOutcome = (outcome, res) => {
-    if (!outcome.is_valid) {
-      res.status(422);
-      return res.json({
-        status: 'error',
-        error: outcome.errors
-      });
-    }
+  const createUserToken = (user, key = SECRET_KEY, duration = 60 * 60 * 24 /* 24 hours */) => {
+    // TODO: Write test to ensure that the user password field is not avalable
+    const token = jwt.sign({
+      user
+    }, key, {
+      expiresIn: duration // expires in 24 hours
+    });
+    return token;
   };
 
   // eslint-disable-next-line arrow-body-style
-  const successResponse = (res, user, token, status) => {
-    res.status(status);
-    return res.json({
-      status: 'success',
-      data: {
-        user_id: user.id,
-        is_admin: user.is_admin,
-        token,
-        auth: true
-      }
-    });
-  };
-
-  const errorResponse = (res, message, status) => {
-    res.status(status);
-    return res.json({
-      status: 'error',
-      error: message
-    });
+  const authSuccessResponse = (res, user, status) => {
+    const data = {
+      user_id: user.id,
+      is_admin: user.is_admin,
+      token: createUserToken(user),
+      auth: true,
+    };
+    successResponse(res, data, status);
   };
 
   async function signIn(req, res) {
-    const outcome = isSignInRequestValid(req.body);
-    checkOutcome(outcome, res);
-    // validation passed
     try {
-      const {
-        rows
-      } = await userRepo.getUserByEmail(req.body.email);
-      const user = rows[0];
-
+      const user = await userRepo.getUserByEmail(req.body.email);
       if (user && userRepo.validatePassword(req.body.password, user.password)) {
         delete user.password;
-        const token = jwt.sign({
-          user
-        }, secretKey, {
-          expiresIn: 86400 // expires in 24 hours
-        });
-        successResponse(res, user, token, 200);
+        return authSuccessResponse(res, user, 200);
       }
       // there was an error // user does not exist
-      errorResponse(res, loginErrorMsg, 401);
+      return errorResponse(res, loginErrorMsg, 401);
     } catch (error) {
       // there was a network error or so
-      errorResponse(res, `Network error (${error.message})`, 500);
+      return errorResponse(res, `Network error (${error.message})`, 500);
     }
   }
 
   async function signUp(req, res) {
-    const outcome = isSignUpRequestValid(req.body);
-    checkOutcome(outcome, res);
-    // validation passed
     try {
       if (await userRepo.userExists(req.body.email)) {
         errorResponse(res, 'email has been taken!', 422);
       }
-      const {
-        rows
-      } = await userRepo.createUser(req.body);
-      const user = rows[0];
-      delete user.password;
-
-      const token = jwt.sign({
-        user
-      }, secretKey, {
-        expiresIn: 86400 // expires in 24 hours
-      });
-      successResponse(res, user, token, 201);
+      const user = await userRepo.createUser(req.body);
+      return authSuccessResponse(res, user, 201);
     } catch (error) {
-      // there was an error, user creation failed
-      errorResponse(res, `Network error (${error.message})`, 500);
+      // there was an error (network), user creation failed
+      return errorResponse(res, `Network error (${error.message})`, 500);
     }
   }
   return Object.freeze({

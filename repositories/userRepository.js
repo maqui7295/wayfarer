@@ -1,9 +1,17 @@
 const bcrypt = require('bcryptjs');
 const pgPool = require('../config/pgPool');
+const CommonRepository = require('./commonRepository');
 
-class UserRepository {
-  constructor(db, crypto) {
-    this.pg = db;
+const deletePassword = (user) => {
+  // eslint-disable-next-line no-param-reassign
+  delete user.password;
+  return user;
+};
+
+
+class UserRepository extends CommonRepository {
+  constructor(tableName, dbConn, crypto) {
+    super(tableName, dbConn);
     this.crypt = crypto;
   }
 
@@ -11,41 +19,23 @@ class UserRepository {
   createUser(data) {
     const password = this.crypt.hashSync(data.password, 10);
     const query = {
-      text:
-        'INSERT INTO users(email, password, first_name, last_name, is_admin) VALUES($1, $2, $3, $4, $5) RETURNING *',
+      text: 'INSERT INTO users(email, password, first_name, last_name, is_admin) VALUES($1, $2, $3, $4, $5) RETURNING *',
       values: [data.email, password, data.first_name, data.last_name, true]
     };
-    return this.pg.query(query);
-  }
-
-  getUserById(id) {
-    return this.getUserByParam('id', id);
+    return this.pg.query(query).then(res => res.rows[0]).then(deletePassword);
   }
 
   getUserByEmail(email) {
-    return this.getUserByParam('email', email);
+    return this.getFieldByValue('email', email).then(res => res[0]);
   }
 
   async userExists(email) {
-    const { rows } = await this.getUserByEmail(email);
-    if (rows.length > 0) {
-      return true;
-    }
-    return false;
+    const result = await this.rowExists('email', email);
+    return result;
   }
 
   validatePassword(password, hash) {
     return this.crypt.compareSync(password, hash);
-  }
-
-  getUserByParam(field, param) {
-    const query = {
-      // give the query a unique name
-      name: 'fetch-user',
-      text: `SELECT * FROM users WHERE ${field} = $1`,
-      values: [param]
-    };
-    return this.pg.query(query);
   }
 
   closeConnection() {
@@ -53,4 +43,4 @@ class UserRepository {
   }
 }
 
-module.exports = new UserRepository(pgPool, bcrypt);
+module.exports = new UserRepository('users', pgPool, bcrypt);

@@ -1,16 +1,36 @@
+const tripRepository = require('../repositories/tripRepository');
+
+const {
+  // eslint-disable-next-line no-unused-vars
+  errorResponse,
+  // eslint-disable-next-line no-unused-vars
+  successResponse
+} = require('../validators/responses');
+
 function tripController() {
-  function createTrip(req, res) {
-    return res.send('creating trips');
+  async function createTrip(req, res) {
+    try {
+      const result = await tripRepository.createTrip(req.body);
+      successResponse(res, result, 201);
+    } catch (error) {
+      errorResponse(res, error.message, 400);
+    }
+    // return res.json('creating trips');
   }
 
-  function getTrips(req, res) {
-    return res.send('getting all trips');
+  async function getTrips(req, res) {
+    try {
+      const result = await tripRepository.all();
+      successResponse(res, result, 200);
+    } catch (error) {
+      errorResponse(res, error.message, 400);
+    }
   }
 
-  return {
+  return Object.freeze({
     createTrip,
     getTrips
-  };
+  });
 }
 
 module.exports = tripController;
