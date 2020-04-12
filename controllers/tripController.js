@@ -15,7 +15,6 @@ function tripController() {
     } catch (error) {
       errorResponse(res, error.message, 400);
     }
-    // return res.json('creating trips');
   }
 
   async function getTrips(req, res) {
@@ -27,7 +26,7 @@ function tripController() {
     }
   }
 
-  return Object.freeze({
+  return ({
     createTrip,
     getTrips
   });

@@ -25,7 +25,7 @@ class UserRepository extends CommonRepository {
     return this.pg.query(query).then(res => res.rows[0]).then(deletePassword);
   }
 
-  getUserByEmail(email) {
+  findUserByEmail(email) {
     return this.getFieldByValue('email', email).then(res => res[0]);
   }
 

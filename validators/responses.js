@@ -1,8 +1,8 @@
 // eslint-disable-next-line consistent-return
 const checkOutcome = (outcome, res) => {
   if (!outcome.is_valid) {
-    // res.status(422);
-    return res.status(422).json({
+    res.status(422);
+    return res.json({
       status: 'error',
       error: outcome.errors
     });
@@ -19,7 +19,7 @@ const successResponse = (res, data, status) => {
 
 const errorResponse = (res, message, status) => {
   res.status(status);
-  res.json({
+  return res.json({
     status: 'error',
     error: message
   });

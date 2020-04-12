@@ -6,7 +6,8 @@ const isSignUpRequestValid = (data) => {
     email: 'required|email',
     first_name: 'required|string',
     last_name: 'required|string',
-    password: 'required'
+    password: 'required|confirmed',
+    password_confirmation: 'required|same:password'
   };
   return isValid(data, rules);
 };

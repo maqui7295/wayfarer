@@ -1,7 +1,7 @@
 const Validator = require('validatorjs');
 
-const isValid = (data, rules) => {
-  const validation = new Validator(data, rules);
+const isValid = (data, rules, customMessages = {}) => {
+  const validation = new Validator(data, rules, customMessages);
   if (validation.fails()) {
     return {
       errors: validation.errors,
