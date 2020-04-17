@@ -1,22 +1,24 @@
 before_script:
-  - psql -c 'create database travis_ci_test;' -U postgres
+  - psql -c 'create database testdb;' -U postgres
+  - psql -c "CREATE USER postgres WITH PASSWORD '92Axq@qwZU$werqklcme212';" -U postgres
   - yarn run initdb
 language: node_js
-node_js: 
-  - "stable"
+node_js:
+  - 'stable'
+  - '12.14.0'
 cache:
   directories:
-    - "node_modules"
+    - 'node_modules'
 
 services:
   - postgresql
 
 addons:
-  postgresql: "11"
+  postgresql: '11'
   apt:
     packages:
-    - postgresql-11
-    - postgresql-client-11
+      - postgresql-11
+      - postgresql-client-11
 env:
   global:
-  - PGPORT=5433
+    - PGPORT=5432
