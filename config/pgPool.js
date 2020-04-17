@@ -2,14 +2,6 @@ const {
   Pool
 } = require('pg');
 
-// const {
-//   DB,
-//   DB_NAME,
-//   DB_USER,
-//   DB_PASSWORD,
-//   DB_HOST,
-//   DB_PORT
-// } = require('./environment');
 
 let dbName = 'wayfarer';
 

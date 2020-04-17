@@ -45,15 +45,7 @@
     "delay": "2500",
     "env": {
       "NODE_ENV": "development",
-      "PORT": "4000",
-      "SECRET_KEY": "some_super_secret_key",
-      "DB": "postgresql",
-      "DB_HOST": "localhost",
-      "DB_PORT": "5432",
-      "DB_NAME": "wayfarer",
-      "DB_USER": "postgres",
-      "DB_PASSWORD": "92Axq@qwZU$werqklcme212",
-      "IMPORTANT": "ensure you manage the above credentials properly"
+      "PORT": "4000"
     }
   }
 }
