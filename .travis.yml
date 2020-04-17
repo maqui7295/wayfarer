@@ -1,4 +1,3 @@
-os: windows
 before_script:
   - yarn install
   - psql -c 'create database travis_ci_test;'
