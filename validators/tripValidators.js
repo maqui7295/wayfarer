@@ -1,19 +1,13 @@
 const isValid = require('./common');
 
-const commonRules = {
-  token: 'required|string',
-  is_admin: 'required|boolean',
-  user_id: 'required|numeric',
-};
-
 const customMessages = {
-  'required.is_admin': 'The is_admin field is required.',
+  'required.bus_id': 'The bus_id field is required.',
   'required.user_id': 'The user_id field is required.',
 };
 
 const isCreateTripRequestValid = (data) => {
   const rules = {
-    ...commonRules,
+    user_id: 'required|numeric',
     bus_id: 'required|numeric',
     origin: 'required|string',
     destination: 'required|string',
@@ -26,7 +20,8 @@ const isCreateTripRequestValid = (data) => {
 
 const isTripRequestValid = (data) => {
   const rules = {
-    ...commonRules
+    user_id: 'required|numeric',
+    bus_id: 'required|numeric',
   };
   return isValid(data, rules, customMessages);
 };

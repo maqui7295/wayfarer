@@ -1,6 +1,7 @@
 const Router = require('express-promise-router');
 
-const tripController = require('../controllers/tripController')();
+const busController = require('../controllers/busController')();
+
 const {
   checkToken,
   verifyToken,
@@ -8,9 +9,10 @@ const {
 } = require('../middlewares/routeMiddlewares');
 
 const {
-  isCreateTripRequestValid,
-  isTripRequestValid
-} = require('../validators/tripValidators');
+  isCreateBusRequestValid,
+  isGetBusesRequestValid,
+  isDeleteBusRequestValid
+} = require('../validators/busValidators');
 
 const {
   checkOutcome
@@ -23,16 +25,15 @@ const validateTripReq = (req, res, next) => {
   let outcome;
   switch (req.method) {
     case 'GET':
-      outcome = isTripRequestValid(req.body);
+      outcome = isGetBusesRequestValid(req.body);
       checkOutcome(outcome, res);
       break;
     case 'POST':
-      outcome = isCreateTripRequestValid(req.body);
+      outcome = isCreateBusRequestValid(req.body);
       checkOutcome(outcome, res);
       break;
-    case 'PATCH':
-      outcome = isTripRequestValid(req.body);
-      checkOutcome(outcome, res);
+    case 'DELETE':
+      outcome = isDeleteBusRequestValid(req.body);
       break;
     default:
       break;
@@ -40,10 +41,9 @@ const validateTripReq = (req, res, next) => {
   next();
 };
 
-router.use('/trips', [checkToken, verifyToken, validateTripReq]);
-router.post('/trips', isAdmin, tripController.createTrip);
-router.get('/trips', tripController.getTrips);
-router.patch('/trips/:tripId', isAdmin, tripController.cancelTrip);
-
+router.use('/bus', [checkToken, validateTripReq, verifyToken]);
+router.post('/bus', isAdmin, busController.createBus);
+router.get('/bus', busController.getBuses);
+router.delete('/bus/:busId', isAdmin, busController.deleteBus);
 
 module.exports = router;

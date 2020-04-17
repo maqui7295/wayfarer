@@ -1,9 +1,12 @@
-/** A Repository containing common functionality
+const QueryBuilder = require('../queryBuilders');
+
+/** A Repository containing common functionality (a mini ORM)
  * @param {String} tableName the name of the database table
  * @param {*} dbConn a database connection object e.g a pgPool
  */
-class CommonRepository {
+class CommonRepository extends QueryBuilder {
   constructor(tableName, dbConn) {
+    super(tableName);
     this.pg = dbConn;
     this.tableName = tableName;
   }
@@ -15,9 +18,9 @@ class CommonRepository {
   all() {
     const query = {
       name: `fetch-${this.tableName}`,
-      text: `SELECT * FROM ${this.tableName}`
+      text: `${this.select()};`
     };
-    return this.pg.query(query).then(res => res.rows);
+    return this.execute(query).then(res => res.rows);
   }
 
   /**
@@ -25,7 +28,11 @@ class CommonRepository {
    * @returns {Promise<{}>} a promise object which resolves to the row selected
    */
   findById(id) {
-    return this.getFieldByValue('id', id).then(rows => rows[0]);
+    const query = {
+      text: `${this.selectWhere({ id })};`,
+      values: [id]
+    };
+    return this.execute(query).then(res => res.rows[0]);
   }
 
   /** Retrieves a row by a field.
@@ -33,13 +40,28 @@ class CommonRepository {
    * @param value the value of the column
    *  @returns {Promise<Array>} a promise which resolves to rows of data
    */
-  getFieldByValue(field, value) {
+  findByField(field, value) {
+    const obj = {};
+    obj[field] = value;
     const query = {
-      name: `fetch-${this.tableName}-by-${field}-${value}`,
-      text: `SELECT * FROM ${this.tableName} WHERE ${field}=$1`,
+      text: `${this.selectWhere(obj)};`,
       values: [value]
     };
-    return this.pg.query(query).then(res => res.rows);
+    return this.execute(query).then(res => res.rows);
+  }
+
+  /** Retrieves a row by a field.
+   * @param {Object} fields the name of the key-value pairs in the where clause
+   *  @returns {Promise<Array>} a promise which resolves to rows of data
+   */
+  findByTwoOrMoreFields(fields) {
+    // get the column values
+    const values = Object.values(fields);
+    const query = {
+      text: `${this.selectWhereAnd(fields)};`,
+      values
+    };
+    return this.execute(query).then(res => res.rows);
   }
 
   /** checks if a record exists in the database.
@@ -48,7 +70,7 @@ class CommonRepository {
    *  @returns {Promise<Boolean>} a promise which resolves to true or false
    */
   async rowExists(field, value) {
-    const rows = await this.getFieldByValue(field, value);
+    const rows = await this.findByField(field, value);
     if (rows.length > 0) {
       return true;
     }
@@ -60,12 +82,23 @@ class CommonRepository {
    * @param value the value of the field
    * @returns {Promise<Number>} which resolves to rowCount (1 on success)
    */
+  deleteById(value) {
+    return this.deleteRow('id', value);
+  }
+
+  /** Deletes a record in the database
+   * @param {String} field the field to use in the where clause
+   * @param value the value of the field
+   * @returns {Promise<Number>} which resolves to rowCount (1 on success)
+   */
   deleteRow(field, value) {
+    const obj = {};
+    obj[field] = value;
     const query = {
-      text: `DELETE FROM ${this.tableName} WHERE ${field}=$1`,
+      text: `${this.deleteWhere(obj)}`,
       values: [value]
     };
-    return this.pg.query(query).then(res => res.rowCount);
+    return this.execute(query).then(res => res.rowCount);
   }
 
   /** Updates a row in the database
@@ -74,19 +107,24 @@ class CommonRepository {
    * @returns {Promise<{}>} the updated row
    */
   update(whereField = {}, columns = {}) {
-    const [
-      [whereKey, whereValue]
-    ] = Object.entries(whereField);
-    // get the column names to be updated
-    const colkeysEq$val = Object.keys(columns).map((key, index) => `${key}=$${index + 2}`).join(', ');
-    // get the column values
+    const [whereValue] = Object.values(whereField);
     const colValues = Object.values(columns);
     const query = {
       name: `update-${this.tableName}-by-${whereField}`,
-      text: `UPDATE ${this.tableName} SET ${colkeysEq$val} WHERE ${whereKey}=$1 RETURNING *`,
+      text: this.updateWhere(whereField, columns),
       values: [whereValue, ...colValues]
     };
-    return this.pg.query(query).then(res => res.rows[0]);
+    return this.execute(query).then(res => res.rows[0]);
+  }
+
+  updateAnd(whereFields, columns) {
+    const whereValues = Object.values(whereFields);
+    const colValues = Object.values(columns);
+    const query = {
+      text: this.updateWhereAnd(whereFields, columns),
+      values: [...whereValues, ...colValues]
+    };
+    return this.execute(query).then(res => res.rows[0]);
   }
 
   /** creates a database record
@@ -94,23 +132,19 @@ class CommonRepository {
    * @returns {Promise<{}>} a promise object which resolved to the newly created record
    */
   create(columns) {
-    // get the column names to be updated
-    const colNames = Object.keys(columns).join(', ');
     // get the column values
     const colValues = Object.values(columns);
-    const colPlaceholders = [];
-
-    colValues.forEach((_, index) => {
-      // bump the index to 1 since it starts from 0
-      colPlaceholders.push(`$${index + 1}`);
-    });
-
     const query = {
-      text: `INSERT INTO ${this.tableName} (${colNames}) VALUES (${colPlaceholders.join(', ')}) RETURNING *`,
+      text: this.insert(columns),
       values: colValues
     };
-    return this.pg.query(query).then(res => res.rows[0]);
+    return this.execute(query).then(res => res.rows[0]);
   }
+
+  execute(query) {
+    return this.pg.query(query);
+  }
+
 }
 
 module.exports = CommonRepository;

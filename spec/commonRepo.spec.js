@@ -52,11 +52,33 @@ describe('Common Repository performs CRUD', () => {
       expect(result).toBe(1);
     });
 
-    it('update: should successfully delete records', async () => {
-      const result = await Repo.update({ email: data.email }, { first_name: 'Mellisa' });
+    it('update: should successfully update records', async () => {
+      const result = await Repo.update({
+        email: data.email
+      }, {
+        first_name: 'Mellisa'
+      });
       expect(record.id).toBe(result.id);
       expect(record.last_name).toBe(result.last_name);
       expect(result.first_name).toBe('Mellisa');
     });
+
+    it('it finds objects by two or more fields', async () => {
+      const result = await Repo.findByTwoOrMoreFields({
+        first_name: 'Dina',
+        last_name: 'Rose'
+      });
+      expect(result[0].first_name).toBe('Dina');
+    });
+
+    it('It updates the row based on the two supplied criteria', async () => {
+      const result = await Repo.updateAnd({
+        first_name: 'Dina',
+        last_name: 'Rose'
+      }, { last_name: 'Rose updated' });
+
+      expect(result.last_name).toBe('Rose updated');
+    });
+
   });
 });

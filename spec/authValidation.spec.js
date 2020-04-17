@@ -2,7 +2,7 @@
 const {
   isSignUpRequestValid,
   isSignInRequestValid
-} = require('../validators/auth_validators');
+} = require('../validators/authValidators');
 
 describe('Authentication requests validation', () => {
   let req;

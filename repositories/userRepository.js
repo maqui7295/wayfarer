@@ -17,16 +17,25 @@ class UserRepository extends CommonRepository {
 
   // create user
   createUser(data) {
+    const {
+      email,
+      first_name,
+      last_name,
+      is_admin
+    } = data;
+
     const password = this.crypt.hashSync(data.password, 10);
-    const query = {
-      text: 'INSERT INTO users(email, password, first_name, last_name, is_admin) VALUES($1, $2, $3, $4, $5) RETURNING *',
-      values: [data.email, password, data.first_name, data.last_name, true]
-    };
-    return this.pg.query(query).then(res => res.rows[0]).then(deletePassword);
+    return this.create({
+      email,
+      password,
+      first_name,
+      last_name,
+      is_admin: !!is_admin
+    }).then(deletePassword);
   }
 
   findUserByEmail(email) {
-    return this.getFieldByValue('email', email).then(res => res[0]);
+    return this.findByField('email', email).then(res => res[0]);
   }
 
   async userExists(email) {

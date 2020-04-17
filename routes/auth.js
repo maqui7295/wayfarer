@@ -5,7 +5,7 @@ const authController = require('../controllers/authController')();
 const {
   isSignUpRequestValid,
   isSignInRequestValid
-} = require('../validators/auth_validators');
+} = require('../validators/authValidators');
 
 const {
   checkOutcome

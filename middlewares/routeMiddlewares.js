@@ -27,8 +27,9 @@ const verifyToken = (req, res, next) => {
     const {
       user
     } = jwt.verify(req.body.token, SECRET_KEY);
+    // we verify that it's the user that is making the request
     // eslint-disable-next-line no-unused-expressions
-    (+req.body.user_id !== user.id) && errorResponse(res, 'user not found', 401);
+    (+req.body.user_id !== user.id) && errorResponse(res, 'user not found', 403);
     if (user.is_admin) {
       req.body.admin_confirmed = true;
     } else {
