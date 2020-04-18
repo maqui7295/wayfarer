@@ -26,12 +26,16 @@ app.use(API_VERSION_1, bookingRouter);
 const port = process.env.PORT || 3000;
 
 
-app.get(API_VERSION_1, (req, res) => res.send('Hello World!'));
+// app.get(API_VERSION_1, (req, res) => res.send('Hello World!'));
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.use(function (req, res, next) {
+  res.status(404)
+  res.sendFile(path.join(__dirname, 'app404.html'));
+})
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
