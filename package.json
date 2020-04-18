@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
+    "prestart": "yarn run initdb",
     "start": "nodemon index.js",
     "test": "jasmine",
+    "coverage": "nyc yarn test && nyc report --reporter=text-lcov | coveralls",
     "initdb": "node initdb.js"
   },
   "repository": {
@@ -21,11 +23,13 @@
   },
   "homepage": "https://github.com/maqui7295/wayfarer#readme",
   "devDependencies": {
+    "coveralls": "^3.0.11",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "^13.2.0",
     "eslint-plugin-import": "^2.17.2",
     "jasmine": "^3.5.0",
     "nodemon": "^1.19.1",
+    "nyc": "^15.0.1",
     "supertest": "^4.0.2"
   },
   "dependencies": {

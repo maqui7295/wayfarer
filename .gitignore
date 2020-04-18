@@ -2,3 +2,4 @@ node_modules
 .vscode
 workspace.code-workspace
 .env
+.coveralls.yml
