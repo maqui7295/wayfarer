@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint .",
     "prestart": "yarn run initdb",
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "test": "jasmine",
     "coverage": "nyc yarn test && nyc report --reporter=text-lcov | coveralls",
     "initdb": "node initdb.js"

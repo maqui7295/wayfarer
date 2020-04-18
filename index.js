@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const {
   API_VERSION_1
@@ -24,7 +25,13 @@ app.use(API_VERSION_1, bookingRouter);
 
 const port = process.env.PORT || 3000;
 
+
 app.get(API_VERSION_1, (req, res) => res.send('Hello World!'));
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
