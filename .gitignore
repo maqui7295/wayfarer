@@ -3,3 +3,4 @@ node_modules
 workspace.code-workspace
 .env
 .coveralls.yml
+.nyc_output
