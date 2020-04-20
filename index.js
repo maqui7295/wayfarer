@@ -28,12 +28,16 @@ const port = process.env.PORT || 3000;
 
 // app.get(API_VERSION_1, (req, res) => res.send('Hello World!'));
 
-app.get('/', function (req, res) {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.use(function (req, res, next) {
-  res.status(404)
+app.get(API_VERSION_1, (req, res) => {
+  res.sendFile(path.join(__dirname, 'v1.html'));
+});
+
+app.use((req, res, next) => {
+  res.status(404);
   res.sendFile(path.join(__dirname, 'app404.html'));
 })
 
